@@ -14,17 +14,23 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 public class IntakeSubsystem extends SubsystemBase {
     private final WPI_TalonSRX m_intakeMotor = new WPI_TalonSRX(Constants.Intake_CANID);
     //private final DigitalInput m_limitSwitch = new DigitalInput(0);
-
-     /** Returns a command that deploys the intake, and then runs the intake motor indefinitely. */
-    public Command intakeCommand() {
+  
+    /** Returns a command that runs the intake in */
+    public Command pickupCommand() {
         return runOnce(() -> m_intakeMotor.set(.5))
-            .withName("Intake");
+            .withName("Pickup");
     }
 
-    /** Returns a command that turns off and retracts the intake. */
+    /** Returns a command that runs the intake in the opposite direction */
     public Command releaseCommand() {
             return runOnce(() -> m_intakeMotor.set(-.5))
             .withName("Release");
     } 
+
+     /** Returns a command that runs the intake in the opposite direction */
+     public Command disableIntakeCommand() {
+        return runOnce(() -> m_intakeMotor.set(0))
+        .withName("Intake Stop");
+} 
 }
  

@@ -8,14 +8,14 @@ package frc.robot;
 import frc.robot.Constants.OIConstants;
 //import frc.robot.commands.Autos;
 //import frc.robot.commands.DriveForward;
-import frc.robot.commands.DefaultDrive;
+//import frc.robot.commands.DefaultDrive;
 //import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 //import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+//import edu.wpi.first.wpilibj2.command.button.Trigger;
 //import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 //import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -42,35 +42,25 @@ public class RobotContainer {
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
 
-
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
-  public void configureBindings() {
-
-    // Set the default drive command to split-stick arcade drive
-    m_drivetrain.setDefaultCommand(
-      new DefaultDrive(
-        m_drivetrain,
-            () -> -m_driverController.getLeftY(),
-            () -> -m_driverController.getRightX()));
-
-     // Deploy the intake with the X button
-     m_driverController.x().onTrue(m_intake.intakeCommand());
-     // Retract the intake with the Y button
-     m_driverController.y().onTrue(m_intake.releaseCommand());
-
-    // ExtendArm when the 'A' button is pressed.
-    //m_driverController.x().onTrue(m_armSubsystem.extendCommand());
-    // Retract the intake with the Y button
-    // m_driverController.y().onTrue(m_armSubsystem.retractCommand());
+  public RobotContainer(){
+    // Configure the button bindings
+    configureButtonBindings();
   
+  }
+
+   
+  public void configureButtonBindings() {
+    m_drivetrain.setDefaultCommand(
+        m_drivetrain.arcadeDriveCommand(
+            () -> -m_driverController.getLeftY(), () -> -m_driverController.getRightX()));
+
+     // Pickup a cube with the X button
+     m_driverController.x().toggleOnTrue(m_intake.pickupCommand());
+     // Shoot the cube with the Y button
+     m_driverController.y().toggleOnTrue(m_intake.releaseCommand());
+     // Stop the intake with the B button
+     m_driverController.b().onTrue(m_intake.disableIntakeCommand());
+ 
     
   }
 
