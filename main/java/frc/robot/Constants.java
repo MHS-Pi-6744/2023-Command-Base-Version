@@ -25,4 +25,10 @@ public final class Constants {
   public static class OIConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static class AutoConstants {
+    public static final double kDriveSpeed = .5;
+    public static final double kTimeoutSeconds = 3;
+  }
+
 }

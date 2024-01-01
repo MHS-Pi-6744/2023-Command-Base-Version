@@ -6,19 +6,19 @@ package frc.robot;
 
 
 import frc.robot.Constants.OIConstants;
-//import frc.robot.commands.Autos;
-//import frc.robot.commands.DriveForward;
-//import frc.robot.commands.DefaultDrive;
-//import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.commands.Autos;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 //import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 //import edu.wpi.first.wpilibj2.command.button.Trigger;
-//import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-//import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -28,40 +28,37 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final Drivetrain m_drivetrain = new Drivetrain();
-  //private final DriveForward m_driveForward = new DriveForward(m_drivetrain);
+  private final Drivetrain m_myRobot = new Drivetrain();
   private final IntakeSubsystem m_intake = new IntakeSubsystem();
-  //private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
-  //private final ExtendArm m_extendArmCommand = new ExtendArm(m_armSubsystem);
+  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
 
-  // The autonomous routines go here
+  // The autonomous routines
+  private final Command m_dropAndGo = Autos.dropAndGoAuto(m_myRobot,m_intake);
 
   // A chooser for autonomous commands
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
+
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
-
-  public RobotContainer(){
-    // Configure the button bindings
-    configureButtonBindings();
-  
-  }
-
-   
-  public void configureButtonBindings() {
-    m_drivetrain.setDefaultCommand(
-        m_drivetrain.arcadeDriveCommand(
-            () -> -m_driverController.getLeftY(), () -> -m_driverController.getRightX()));
-
-     // Pickup a cube with the X button
-     m_driverController.x().toggleOnTrue(m_intake.pickupCommand());
-     // Shoot the cube with the Y button
-     m_driverController.y().toggleOnTrue(m_intake.releaseCommand());
-     // Stop the intake with the B button
-     m_driverController.b().onTrue(m_intake.disableIntakeCommand());
  
+
+  public void configureButtonBindings() {
+    // Set the default drive command to split-stick arcade drive
+    m_myRobot.setDefaultCommand(
+      m_myRobot.arcadeDriveCommand(
+          () -> -m_driverController.getLeftY(), () -> -m_driverController.getRightX()));
+
+    // Pickup a cube with the X button
+    m_driverController.x().whileTrue(m_intake.pickupCommand());
+    // Shoot the cube with the Y button
+    m_driverController.y().whileTrue(m_intake.releaseCommand());
     
+    // Run the arm motor in reverse for x seconds
+    m_driverController.b().onTrue(m_armSubsystem.retractArmCommand().withTimeout(3));
+    // Run the arm motor for x seconds
+    m_driverController.a().onTrue(m_armSubsystem.extendArmCommand().withTimeout(3));
+   
   }
 
   /**
@@ -71,8 +68,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return m_chooser.getSelected();
-  //}
+    return m_dropAndGo;
+  
 }
 
  

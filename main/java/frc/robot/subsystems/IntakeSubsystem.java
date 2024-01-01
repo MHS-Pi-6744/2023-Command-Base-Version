@@ -4,6 +4,8 @@ package frc.robot.subsystems;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
+
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 //import frc.robot.Constants;
 
@@ -13,24 +15,30 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class IntakeSubsystem extends SubsystemBase {
     private final WPI_TalonSRX m_intakeMotor = new WPI_TalonSRX(Constants.Intake_CANID);
-    //private final DigitalInput m_limitSwitch = new DigitalInput(0);
+
+    static final double intakeSpeed = .5;
   
-    /** Returns a command that runs the intake in */
+/** Returns a command that runs the intake */
     public Command pickupCommand() {
-        return runOnce(() -> m_intakeMotor.set(.5))
-            .withName("Pickup");
-    }
+        return startEnd(
+                // Start the intake motor
+                () -> m_intakeMotor.set(intakeSpeed), 
+                // Stop the motor when command ends
+                () -> m_intakeMotor.stopMotor());
+        }
 
-    /** Returns a command that runs the intake in the opposite direction */
+/** Returns a command that runs the intake in the opposite direction */
     public Command releaseCommand() {
-            return runOnce(() -> m_intakeMotor.set(-.5))
-            .withName("Release");
-    } 
+        return startEnd(
+                // Start the intake motor in reverse
+                () -> m_intakeMotor.set(-intakeSpeed), 
+                // Stop the motor when command ends
+                () -> m_intakeMotor.stopMotor());
+        }
 
-     /** Returns a command that runs the intake in the opposite direction */
-     public Command disableIntakeCommand() {
-        return runOnce(() -> m_intakeMotor.set(0))
-        .withName("Intake Stop");
-} 
+ @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+  }
 }
  
